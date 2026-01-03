@@ -1,70 +1,62 @@
-const GUMROAD_VERIFY_URL = "https://api.gumroad.com/v2/licenses/verify";
+// netlify/functions/verify.js
 
-export const handler = async (event) => {
-  if (event.httpMethod !== "GET") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ ok: false, error: "Method not allowed" }),
-    };
-  }
-
-  const license_key = event.queryStringParameters?.license_key;
-
-  if (!license_key) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ ok: false, error: "Missing license_key" }),
-    };
-  }
-
-  const product_permalink = process.env.GUMROAD_PRODUCT_PERMALINK;
-  const access_token = process.env.GUMROAD_ACCESS_TOKEN;
-
-  if (!product_permalink || !access_token) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        ok: false,
-        error: "Server not configured (missing env vars)",
-      }),
-    };
-  }
-
-  const params = new URLSearchParams({
-    product_permalink,
-    license_key,
-  });
-
+exports.handler = async (event) => {
   try {
-    const response = await fetch(
-      `${GUMROAD_VERIFY_URL}?${params.toString()}`,
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    );
+    // Accept license key as query param: ?license_key=XXXX
+    const licenseKey =
+      event.queryStringParameters?.license_key ||
+      event.queryStringParameters?.license ||
+      "";
 
-    const data = await response.json();
+    if (!licenseKey) {
+      return {
+        statusCode: 400,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ok: false, error: "Missing license_key" }),
+      };
+    }
 
-    const valid =
-      data?.success === true &&
-      !data?.purchase?.refunded &&
-      !data?.purchase?.chargebacked &&
-      !data?.purchase?.disputed;
+    const productId = process.env.GUMROAD_PRODUCT_ID;
+    if (!productId) {
+      return {
+        statusCode: 500,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ok: false,
+          error: "Server not configured: missing GUMROAD_PRODUCT_ID",
+        }),
+      };
+    }
 
+    // Call Gumroad license verification endpoint
+    const params = new URLSearchParams();
+    params.set("product_id", productId);
+    params.set("license_key", licenseKey);
+    // optional: do not increment uses while testing
+    params.set("increment_uses_count", "false");
+
+    const resp = await fetch("https://api.gumroad.com/v2/licenses/verify", {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+    });
+
+    const data = await resp.json();
+
+    // Gumroad returns { success: true/false, ... }
     return {
       statusCode: 200,
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ ok: valid }),
+      body: JSON.stringify({
+        ok: Boolean(data.success),
+        gumroad: data,
+      }),
     };
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        ok: false,
-        error: "Verification failed",
-      }),
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ok: false, error: String(err) }),
     };
   }
 };
