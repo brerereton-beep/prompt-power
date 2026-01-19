@@ -1,25 +1,35 @@
-# Prompt Power
+# Prompt Power (Chrome Extension)
 
-Prompt Power is a Chrome extension that improves AI prompts instantly.
+Prompt Power improves AI prompts instantly — directly inside your browser.
 
-It turns rough or unclear prompts into clear, usable instructions in one click — directly inside your browser.
+Turn rough, unclear prompts into clear, usable instructions in one click so you get better outputs with less back-and-forth.
 
 ## What it does
-- Improves prompt clarity
-- Helps get more consistent AI outputs
-- Saves time rewriting prompts
+- Improves prompt clarity and structure
+- Helps you get more consistent AI results
+- Saves time rewriting and troubleshooting prompts
 
 ## How it works
-1. Paste or write your prompt
-2. Click “Improve”
+1. Write or paste a prompt
+2. Click **Improve**
 3. Copy the improved prompt and use it anywhere
 
 ## Pricing
-- Free version available
-- Pro version: £7.99 one-off
+- **Pro:** £7.99 (one-off)
 
 ## Install
-👉 Chrome Web Store link goes here
-
+- **Chrome Web Store:** [
+](https://chromewebstore.google.com/detail/ibpogkifohcbefmmgboneclcoakodeld?utm_source=item-share-cb)
+## Privacy
+Prompt Power does not sell personal data.  
+Privacy policy: [
+](https://github.com/brerereton-beep/prompt-power-privacy)
 ## Status
-Actively developed and updated.
+Actively maintained. Recent improvements include:
+- Consistent textbox sizing
+- Scroll support for long prompts
+- Platform icons added
+- “Copy improved prompt” button
+
+## Support
+If you run into issues or have a feature request, open an Issue on this repo.
